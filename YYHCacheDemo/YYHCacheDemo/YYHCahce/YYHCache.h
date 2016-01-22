@@ -14,10 +14,21 @@
 
 - (BOOL)containsObjectForKey:(NSString *)key;
 
-- (id)objectForKey:(NSString *)key;
-- (void)setObject:(id)object forKey:(NSString *)key;
+- (id<NSCoding>)objectForKey:(NSString *)key;
+- (void)setObject:(id<NSCoding>)object forKey:(NSString *)key;
 
-- (void)removeObjectForKey:(id)key;
+- (void)removeObjectForKey:(NSString *)key;
 - (void)removeAllObjects;
+
+#pragma mark - Block
+- (void)containsObjectForKey:(NSString *)key withBlock:(void(^)(NSString *key, BOOL bContains))block;
+
+- (void)objectForKey:(NSString *)key withBlock:(void(^)(NSString *key, id<NSCoding> object))block;
+- (void)setObject:(id<NSCoding>)object forKey:(NSString *)key withBlock:(void(^)(NSString *key))block;
+
+- (void)removeObjectForKey:(NSString *)key withBlock:(void(^)(NSString *key))block;
+- (void)removeAllObjectsWithBlock:(void(^)())block;
+
+- (void)cacheSize:(void(^)(NSUInteger size))block;
 
 @end

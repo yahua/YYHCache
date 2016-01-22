@@ -46,7 +46,20 @@
     return [_memoryCache containsObjectForKey:key] || [_diskCache containsObjectForKey:key];
 }
 
-- (id)objectForKey:(NSString *)key {
+- (void)containsObjectForKey:(NSString *)key withBlock:(void(^)(NSString *key, BOOL bContains))block {
+    
+    if (!block) {
+        return;
+    }
+    if ([_memoryCache containsObjectForKey:key]) {
+        block(key, YES);
+    }else {
+        [_diskCache containsObjectForKey:key withBlock:block];
+    }
+}
+
+
+- (id<NSCoding>)objectForKey:(NSString *)key {
     
     id object = [_memoryCache objectForKey:key];
     if (!object) {
@@ -58,10 +71,31 @@
     return object;
 }
 
-- (void)setObject:(id)object forKey:(NSString *)key {
+- (void)objectForKey:(NSString *)key withBlock:(void (^)(NSString *key, id<NSCoding> object))block {
+    
+    if (!block) return;
+    id<NSCoding> object = [_memoryCache objectForKey:key];
+    if (object) {
+        block(key, object);
+    } else {
+        [_diskCache objectForKey:key withBlock:block];
+    }
+}
+
+- (void)setObject:(id<NSCoding>)object forKey:(NSString *)key {
     
     [_memoryCache setObject:object forKey:key];
     [_diskCache setObject:object forKey:key];
+}
+
+- (void)setObject:(id<NSCoding>)object forKey:(NSString *)key withBlock:(void(^)(NSString *key))block {
+    
+    if (!block) {
+        return;
+    }
+    
+    [_memoryCache setObject:object forKey:key];
+    [_diskCache setObject:object forKey:key withBlock:block];
 }
 
 - (void)removeObjectForKey:(NSString *)key {
@@ -70,10 +104,34 @@
     [_diskCache removeObjectForKey:key];
 }
 
+- (void)removeObjectForKey:(NSString *)key withBlock:(void(^)(NSString *key))block {
+    
+    if (!block) {
+        return;
+    }
+    [_memoryCache removeObjectForKey:key];
+    [_diskCache removeObjectForKey:key withBlock:block];
+}
+
 - (void)removeAllObjects {
     
     [_memoryCache removeAllObjects];
     [_diskCache removeAllObjects];
+}
+
+- (void)removeAllObjectsWithBlock:(void(^)())block {
+    
+    if (!block) {
+        return;
+    }
+    [_memoryCache removeAllObjects];
+    [_diskCache removeAllObjectsWithBlock:block];
+}
+
+- (void)cacheSize:(void(^)(NSUInteger size))block {
+    
+    if(!block) return;
+    [_diskCache cacheSize:block];
 }
 
 @end

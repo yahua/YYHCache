@@ -52,22 +52,27 @@
     @autoreleasepool {
         for (int i = 0; i < count; i++) {
             [memoryCache setObject:values[i] forKey:keys[i]];
+//            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+//                [memoryCache setObject:values[i] forKey:keys[i]];
+//            });
         }
     }
     end = CACurrentMediaTime();
     time = end - begin;
     printf("YYHMemoryCache:   %8.2f\n", time * 1000);
-    
+    count = 1000;
     begin = CACurrentMediaTime();
     @autoreleasepool {
         for (int i = 0; i < count; i++) {
-            [diskCache setObject:values[i] forKey:keys[i]];
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                [diskCache setObject:values[i] forKey:keys[i]];
+            });
         }
     }
     end = CACurrentMediaTime();
     time = end - begin;
     printf("YYHDiskCache:     %8.2f\n", time * 1000);
-    
+    [diskCache removeAllObjects];
     
 }
 

@@ -60,7 +60,6 @@
 		1964BE401C50C62F00F58B56 /* YYHDiskCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYHDiskCache.m; sourceTree = "<group>"; };
 		1964BE421C50C71100F58B56 /* YYHMemoryCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYHMemoryCache.h; sourceTree = "<group>"; };
 		1964BE431C50C71100F58B56 /* YYHMemoryCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYHMemoryCache.m; sourceTree = "<group>"; };
-		1964BE451C50C91300F58B56 /* YYHCacheProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YYHCacheProtocol.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -160,7 +159,6 @@
 				1964BE401C50C62F00F58B56 /* YYHDiskCache.m */,
 				1964BE421C50C71100F58B56 /* YYHMemoryCache.h */,
 				1964BE431C50C71100F58B56 /* YYHMemoryCache.m */,
-				1964BE451C50C91300F58B56 /* YYHCacheProtocol.h */,
 			);
 			path = YYHCahce;
 			sourceTree = "<group>";
@@ -526,6 +524,7 @@
 				1964BE341C50C5A200F58B56 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		1964BE351C50C5A200F58B56 /* Build configuration list for PBXNativeTarget "YYHCacheDemoTests" */ = {
 			isa = XCConfigurationList;
@@ -534,6 +533,7 @@
 				1964BE371C50C5A200F58B56 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		1964BE381C50C5A200F58B56 /* Build configuration list for PBXNativeTarget "YYHCacheDemoUITests" */ = {
 			isa = XCConfigurationList;
@@ -542,6 +542,7 @@
 				1964BE3A1C50C5A200F58B56 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

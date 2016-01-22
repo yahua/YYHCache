@@ -7,8 +7,18 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "YYHCacheProtocol.h"
 
-@interface YYHMemoryCache : NSObject <YYHCacheProtocol>
+@interface YYHMemoryCache : NSObject
+
+//UIApplicationDidReceiveMemoryWarningNotification 是否要清楚内存缓存, 默认为YES
+@property (nonatomic, assign) BOOL clearWhenMemoryLow;
+
+- (BOOL)containsObjectForKey:(NSString *)key;
+
+- (id)objectForKey:(NSString *)key;
+- (void)setObject:(id)object forKey:(NSString *)key;
+
+- (void)removeObjectForKey:(NSString *)key;
+- (void)removeAllObjects;
 
 @end
