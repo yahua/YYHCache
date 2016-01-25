@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		194928D71C56143C00A09087 /* YYHCodingObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 194928D61C56143C00A09087 /* YYHCodingObject.m */; };
 		1964BE0A1C50C5A200F58B56 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 1964BE091C50C5A200F58B56 /* main.m */; };
 		1964BE0D1C50C5A200F58B56 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1964BE0C1C50C5A200F58B56 /* AppDelegate.m */; };
 		1964BE101C50C5A200F58B56 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1964BE0F1C50C5A200F58B56 /* ViewController.m */; };
@@ -38,6 +39,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		194928D51C56143C00A09087 /* YYHCodingObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYHCodingObject.h; sourceTree = "<group>"; };
+		194928D61C56143C00A09087 /* YYHCodingObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYHCodingObject.m; sourceTree = "<group>"; };
 		1964BE051C50C5A200F58B56 /* YYHCacheDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = YYHCacheDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1964BE091C50C5A200F58B56 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		1964BE0B1C50C5A200F58B56 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -87,6 +90,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		194928D41C56141E00A09087 /* YYHCodingObject */ = {
+			isa = PBXGroup;
+			children = (
+				194928D51C56143C00A09087 /* YYHCodingObject.h */,
+				194928D61C56143C00A09087 /* YYHCodingObject.m */,
+			);
+			path = YYHCodingObject;
+			sourceTree = "<group>";
+		};
 		1964BDFC1C50C5A200F58B56 = {
 			isa = PBXGroup;
 			children = (
@@ -153,6 +165,7 @@
 		1964BE3B1C50C5C500F58B56 /* YYHCahce */ = {
 			isa = PBXGroup;
 			children = (
+				194928D41C56141E00A09087 /* YYHCodingObject */,
 				1964BE3C1C50C5F900F58B56 /* YYHCache.h */,
 				1964BE3D1C50C5F900F58B56 /* YYHCache.m */,
 				1964BE3F1C50C62F00F58B56 /* YYHDiskCache.h */,
@@ -293,6 +306,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				194928D71C56143C00A09087 /* YYHCodingObject.m in Sources */,
 				1964BE101C50C5A200F58B56 /* ViewController.m in Sources */,
 				1964BE441C50C71100F58B56 /* YYHMemoryCache.m in Sources */,
 				1964BE411C50C62F00F58B56 /* YYHDiskCache.m in Sources */,

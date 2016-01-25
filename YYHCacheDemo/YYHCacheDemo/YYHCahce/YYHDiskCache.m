@@ -13,6 +13,8 @@ static const NSInteger kDefaultCacheMaxCacheAge = 60 * 60 * 24 * 7; // 1 week
 
 @interface YYHDiskCache ()
 
+@property (nonatomic, copy, readwrite) NSString *name;
+@property (nonatomic, copy, readwrite) NSURL *cacheURL;
 @property (nonatomic, strong) NSFileManager *fileManager;
 @property (nonatomic, assign) NSInteger maxCacheAge;
 
@@ -25,20 +27,27 @@ static const NSInteger kDefaultCacheMaxCacheAge = 60 * 60 * 24 * 7; // 1 week
 
 - (instancetype)init {
     
-    NSAssert(0, @"应该调用initWithName:");
+    NSAssert(0, @"initWithName: or initWithName: rootPath:");
     return nil;
 }
 
 - (instancetype)initWithName:(NSString *)name {
     
+    return [self initWithName:name rootPath:[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0]];
+}
+
+- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath {
+    
     if (!name) {
         name = @"";
+    }
+    if (!rootPath) {
+        rootPath = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0];
     }
     if (self = [super init]) {
         
         _maxCacheAge = kDefaultCacheMaxCacheAge;
         _autoTrimInterval = 10*60;  //10 miminute
-        NSString *rootPath = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0];
         NSString *pathComponent = [[NSString alloc] initWithFormat:@"%@.%@", YYHDiskCachePrefix, name];
         _cacheURL = [NSURL fileURLWithPathComponents:@[rootPath, pathComponent]];
         _fileManager = [NSFileManager new];
@@ -53,6 +62,7 @@ static const NSInteger kDefaultCacheMaxCacheAge = 60 * 60 * 24 * 7; // 1 week
         _lock = [NSLock new];
         _asyncQueue = dispatch_queue_create("com.yahua.diskCache", DISPATCH_QUEUE_CONCURRENT); //并行队列
         
+        //清除过期的缓存文件
         [self p_trimRecurrence];
     }
     
