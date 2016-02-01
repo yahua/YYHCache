@@ -8,6 +8,7 @@
 
 #import "YYHMemoryCache.h"
 #import <UIKit/UIKit.h>
+#import <pthread.h>
 
 #define DEFAULT_MAX_COUNT (48)
 
@@ -17,7 +18,7 @@
 @property (nonatomic, strong) NSMutableArray *cacheKeyList;
 @property (nonatomic, strong) NSMutableDictionary *cacheObjectDic;
 
-@property (nonatomic, strong) NSLock *lock;
+@property (nonatomic, assign) pthread_mutex_t mutexLock;
 
 @end
 
@@ -37,7 +38,7 @@
         _cacheKeyList = [NSMutableArray arrayWithCapacity:1];
         _cacheObjectDic = [NSMutableDictionary dictionaryWithCapacity:1];
         
-        _lock = [NSLock new];
+        pthread_mutex_init(&_mutexLock, NULL);
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didReceiveMemoryWarningNotification) name:UIApplicationDidReceiveMemoryWarningNotification object:nil];
     }
@@ -58,9 +59,9 @@
 - (BOOL)containsObjectForKey:(NSString *)key {
     
     BOOL bContains = NO;
-    [_lock lock];
+    [self lock];
     bContains = ([_cacheObjectDic objectForKey:key] != nil);
-    [_lock unlock];
+    [self unlock];
     
     return bContains;
 }
@@ -68,9 +69,9 @@
 - (id)objectForKey:(NSString *)key {
     
     id object = nil;
-    [_lock lock];
+    [self lock];
     object = [_cacheObjectDic objectForKey:key];
-    [_lock unlock];
+    [self unlock];
     
     return object;
 }
@@ -86,10 +87,10 @@
         return;
     }
     
-    [_lock lock];
+    [self lock];
     
     if ([_cacheObjectDic objectForKey:key] == object) {
-        [_lock unlock];
+        [self unlock];
         return;
     }
     
@@ -101,29 +102,41 @@
     }
     [_cacheObjectDic setObject:object forKey:key];
     
-    [_lock unlock];
+    [self unlock];
 }
 
 - (void)removeObjectForKey:(NSString *)key {
     
-    [_lock lock];
+    [self lock];
     
     if ([_cacheKeyList containsObject:key]) {
         [_cacheKeyList removeObject:key];
         [_cacheObjectDic removeObjectForKey:key];
     }
     
-    [_lock unlock];
+    [self unlock];
 }
 
 - (void)removeAllObjects {
     
-    [_lock lock];
+    [self lock];
     
     [_cacheKeyList removeAllObjects];
     [_cacheObjectDic removeAllObjects];
     
-    [_lock unlock];
+    [self unlock];
+}
+
+#pragma mark - Private 
+
+- (void)lock {
+    
+    pthread_mutex_lock(&_mutexLock);
+}
+
+- (void)unlock {
+    
+    pthread_mutex_unlock(&_mutexLock);
 }
 
 @end

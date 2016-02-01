@@ -51,10 +51,10 @@
     begin = CACurrentMediaTime();
     @autoreleasepool {
         for (int i = 0; i < count; i++) {
-            [memoryCache setObject:values[i] forKey:keys[i]];
-//            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-//                [memoryCache setObject:values[i] forKey:keys[i]];
-//            });
+            //[memoryCache setObject:values[i] forKey:keys[i]];
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                [memoryCache setObject:values[i] forKey:keys[i]];
+            });
         }
     }
     end = CACurrentMediaTime();
