@@ -105,7 +105,10 @@ static const NSInteger kDefaultCacheMaxCacheAge = 60 * 60 * 24 * 7; // 1 week
     id<NSCoding> object = nil;
     [_lock lock];
     NSData *data = [NSData dataWithContentsOfURL:[self p_fileNameWithKey:key]];
-    if (!data) return nil;
+    if (!data) {
+        [_lock unlock];
+        return nil;
+    }
     @try {
         object = [NSKeyedUnarchiver unarchiveObjectWithData:data];
     }
@@ -145,8 +148,7 @@ static const NSInteger kDefaultCacheMaxCacheAge = 60 * 60 * 24 * 7; // 1 week
         @catch (NSException *exception) {
             NSAssert(0, @"不是NSCoding");
         }
-        if (!value)  return;
-        
+
         [value writeToURL:[self p_fileNameWithKey:key] atomically:NO];
         [_lock unlock];
     }
