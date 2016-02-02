@@ -12,8 +12,9 @@
 
 @interface YYHCache ()
 
-@property (nonatomic, strong) YYHMemoryCache *memoryCache;
-@property (nonatomic, strong) YYHDiskCache *diskCache;
+@property (nonatomic, strong, readwrite) YYHMemoryCache *memoryCache;
+@property (nonatomic, strong, readwrite) YYHDiskCache *diskCache;
+@property (nonatomic, copy, readwrite) NSString *name;
 
 @end
 
@@ -24,17 +25,23 @@
     static YYHCache *cache = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        cache = [YYHCache new];
+        cache = [[YYHCache alloc] initWithName:@"YYHCache"];
     });
     return cache;
 }
 
-- (instancetype)init
+- (instancetype)initWithName:(NSString *)name
 {
+    return [self initWithName:name rootPath:[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0]];
+}
+
+- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath {
+    
     self = [super init];
     if (self) {
+        _name = name;
         _memoryCache = [YYHMemoryCache new];
-        _diskCache = [YYHDiskCache new];
+        _diskCache = [[YYHDiskCache alloc] initWithName:name rootPath:rootPath];
     }
     return self;
 }

@@ -10,7 +10,11 @@
 
 @interface YYHMemoryCache : NSObject
 
-//UIApplicationDidReceiveMemoryWarningNotification 是否要清楚内存缓存, 默认为YES
+/**
+ *  @author wangsw, 16-01-25 17:01:36
+ *
+ *  当收到UIApplicationDidReceiveMemoryWarningNotification通知时 是否要清除内存缓存, 默认为YES
+ */
 @property (nonatomic, assign) BOOL clearWhenMemoryLow;
 
 - (BOOL)containsObjectForKey:(NSString *)key;
