@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface YYHDiskCache : NSObject 
+@interface YYHDiskCache : NSObject
 
 /**
  *  @author wangsw, 16-01-25 17:01:42
@@ -31,6 +31,11 @@
  its limits, and if the limit is reached, it begins to evict objects.
  */
 @property (assign) NSTimeInterval autoTrimInterval;
+
+/**
+ 缓存文件的最大容量  默认 20M
+ */
+@property (nonatomic) NSInteger maxCacheCost;
 
 /**
  *  @author wangsw, 16-01-22 19:01:25

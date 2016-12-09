@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
 
 
   s.name         = "YYHCache"
-  s.version      = "0.0.5"
+  s.version      = "0.0.6"
   s.summary      = "data of Cache"
   s.description  = <<-DESC
                    Memory cache disk cache.
@@ -17,7 +17,7 @@ Pod::Spec.new do |s|
   s.requires_arc = true
 
 
-  s.source       = { :git => "https://github.com/yahua/YYHCache.git", :tag => "0.0.5" }
+  s.source       = { :git => "https://github.com/yahua/YYHCache.git", :tag => "0.0.6" }
 
 
   s.source_files  = "YYHCache/*.{h,m}"

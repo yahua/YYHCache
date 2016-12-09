@@ -10,6 +10,7 @@
 
 #define YYHDiskCachePrefix @"YYHCache"
 static const NSInteger kDefaultCacheMaxCacheAge = 60 * 60 * 24 * 7; // 1 week
+static const NSInteger kDefaultCacheMaxCacheCost = 1024 *1024 * 20; //20 M
 
 @interface YYHDiskCache ()
 
@@ -47,6 +48,7 @@ static const NSInteger kDefaultCacheMaxCacheAge = 60 * 60 * 24 * 7; // 1 week
     if (self = [super init]) {
         
         _maxCacheAge = kDefaultCacheMaxCacheAge;
+        _maxCacheCost = kDefaultCacheMaxCacheCost;
         _autoTrimInterval = 10*60;  //10 miminute
         NSString *pathComponent = [[NSString alloc] initWithFormat:@"%@.%@", YYHDiskCachePrefix, name];
         _cacheURL = [NSURL fileURLWithPathComponents:@[rootPath, pathComponent]];
@@ -148,7 +150,7 @@ static const NSInteger kDefaultCacheMaxCacheAge = 60 * 60 * 24 * 7; // 1 week
         @catch (NSException *exception) {
             NSAssert(0, @"不是NSCoding");
         }
-
+        
         [value writeToURL:[self p_fileNameWithKey:key] atomically:NO];
         [_lock unlock];
     }
@@ -226,13 +228,7 @@ static const NSInteger kDefaultCacheMaxCacheAge = 60 * 60 * 24 * 7; // 1 week
     __weak __typeof(self)weakSelf = self;
     dispatch_async(self.asyncQueue, ^{
         __strong __typeof(weakSelf)self = weakSelf;
-        NSDirectoryEnumerator *fileEnumerator = [self.fileManager enumeratorAtPath:[self.cacheURL path]];
-        NSUInteger size = 0;
-        for (NSString *fileName in fileEnumerator) {
-            NSString *filePath = [[self.cacheURL path] stringByAppendingPathComponent:fileName];
-            NSDictionary *attrs = [[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:nil];
-            size += [attrs fileSize];
-        }
+        NSUInteger size = [self p_cacheSize];
         block(size);
     });
 }
@@ -245,27 +241,46 @@ static const NSInteger kDefaultCacheMaxCacheAge = 60 * 60 * 24 * 7; // 1 week
     return [_cacheURL URLByAppendingPathComponent:key];
 }
 
+- (NSUInteger)p_cacheSize {
+    
+    NSDirectoryEnumerator *fileEnumerator = [self.fileManager enumeratorAtPath:[self.cacheURL path]];
+    NSUInteger size = 0;
+    for (NSString *fileName in fileEnumerator) {
+        NSString *filePath = [[self.cacheURL path] stringByAppendingPathComponent:fileName];
+        NSDictionary *attrs = [[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:nil];
+        size += [attrs fileSize];
+    }
+    return size;
+}
+
 - (void)p_trimRecurrence {  //循环调用
+    
+    [self p_trimInBackGround];
     
     __weak __typeof(self)weakSelf = self;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(_autoTrimInterval * NSEC_PER_SEC)),
                    dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
-        __strong __typeof(weakSelf)self = weakSelf;
-        if (!self) return;
-        [self p_trimInBackGround];
-        [self p_trimRecurrence];
-    });
+                       __strong __typeof(weakSelf)self = weakSelf;
+                       if (!self) return;
+                       [self p_trimRecurrence];
+                   });
 }
 
-- (void)p_trimInBackGround { //清楚过期缓存
+- (void)p_trimInBackGround { //清除过期缓存
+    
+    [self p_trimWithAge];
+    [self p_trimWithCost];
+}
+
+- (void)p_trimWithAge {
     
     __weak __typeof(self)weakSelf = self;
     dispatch_async(_asyncQueue, ^{
         
         __strong __typeof(weakSelf)self = weakSelf;
-        NSArray *resourceKeys = @[NSURLIsDirectoryKey, NSURLContentModificationDateKey, NSURLTotalFileAllocatedSizeKey];
+        NSArray *resourceKeys = @[NSURLIsDirectoryKey, NSURLContentModificationDateKey];
         
-        [self lock];
+        [self.lock lock];
         // This enumerator prefetches useful properties for our cache files.
         NSDirectoryEnumerator *fileEnumerator = [_fileManager enumeratorAtURL:_cacheURL
                                                    includingPropertiesForKeys:resourceKeys
@@ -273,7 +288,7 @@ static const NSInteger kDefaultCacheMaxCacheAge = 60 * 60 * 24 * 7; // 1 week
                                                                  errorHandler:NULL];
         
         NSDate *expirationDate = [NSDate dateWithTimeIntervalSinceNow:-self.maxCacheAge];
-
+        
         // Enumerate all of the files in the cache directory.  This loop has two purposes:
         //
         //  1. Removing files that are older than the expiration date.
@@ -299,8 +314,53 @@ static const NSInteger kDefaultCacheMaxCacheAge = 60 * 60 * 24 * 7; // 1 week
         for (NSURL *fileURL in urlsToDelete) {
             [_fileManager removeItemAtURL:fileURL error:nil];
         }
+        
         [self.lock unlock];
     });
 }
+
+- (void)p_trimWithCost {
+    
+    __weak __typeof(self)weakSelf = self;
+    dispatch_async(_asyncQueue, ^{
+        
+        __strong __typeof(weakSelf)self = weakSelf;
+        NSArray *resourceKeys = @[NSURLIsDirectoryKey, NSURLContentModificationDateKey];
+        
+        [self.lock lock];
+        
+        NSDirectoryEnumerator *fileEnumerator = [_fileManager enumeratorAtURL:_cacheURL
+                                                   includingPropertiesForKeys:resourceKeys
+                                                                      options:NSDirectoryEnumerationSkipsHiddenFiles
+                                                                 errorHandler:NULL];
+        NSMutableArray *urlList = [[NSMutableArray alloc] init];
+        for (NSURL *fileURL in fileEnumerator) {
+            [urlList addObject:fileURL];
+        }
+        //按时间排序
+        NSMutableArray *sortedPaths =[NSMutableArray arrayWithArray:[urlList sortedArrayUsingComparator:^(NSURL * firstPathURL, NSURL* secondPathURL) {//
+            NSDictionary *firstResourceValues = [firstPathURL resourceValuesForKeys:resourceKeys error:NULL];
+            NSDictionary *secondResourceValues = [secondPathURL resourceValuesForKeys:resourceKeys error:NULL];
+            NSDate *firstData = firstResourceValues[NSURLContentModificationDateKey];//获取前一个文件修改时间
+            NSDate *secondData = secondResourceValues[NSURLContentModificationDateKey];//获取后一个文件修改时间
+            return [firstData compare:secondData];//升序
+        }]];
+        
+        if ([self p_cacheSize]>self.maxCacheCost) {
+            //删除一半的缓存
+            while ([self p_cacheSize]>self.maxCacheCost) {
+                if (sortedPaths.count == 0) {
+                    break;
+                }
+                NSURL *deleteFileUrl = sortedPaths.firstObject;
+                [_fileManager removeItemAtURL:deleteFileUrl error:nil];
+                [sortedPaths removeObjectAtIndex:0];
+            }
+        }
+        
+        [self.lock unlock];
+    });
+}
+
 
 @end
