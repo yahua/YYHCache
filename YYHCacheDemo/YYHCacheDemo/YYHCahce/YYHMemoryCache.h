@@ -20,6 +20,13 @@
 - (BOOL)containsObjectForKey:(NSString *)key;
 
 - (id)objectForKey:(NSString *)key;
+
+/**
+ 将object
+
+ @param object <#object description#>
+ @param key <#key description#>
+ */
 - (void)setObject:(id)object forKey:(NSString *)key;
 
 - (void)removeObjectForKey:(NSString *)key;

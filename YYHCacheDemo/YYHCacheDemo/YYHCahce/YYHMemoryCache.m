@@ -14,7 +14,14 @@
 
 @interface YYHMemoryCache ()
 
+/**
+ 允许最大的缓存数
+ */
 @property (nonatomic, assign) NSInteger maxCacheCount;
+
+/**
+ 记录key加入的顺序， 方便移除
+ */
 @property (nonatomic, strong) NSMutableArray *cacheKeyList;
 @property (nonatomic, strong) NSMutableDictionary *cacheObjectDic;
 
@@ -83,18 +90,20 @@
     }
     
     if (!object) {
+        
         [self removeObjectForKey:key];
         return;
     }
     
     [self lock];
     
-    if ([_cacheObjectDic objectForKey:key] == object) {
+    if ([[_cacheObjectDic objectForKey:key] isEqual:object]) {
         [self unlock];
         return;
     }
     
     [_cacheKeyList addObject:key];
+    //大于最大缓存数时，移除第一个
     if (_cacheKeyList.count>_maxCacheCount) {
         NSString *removeKey = [_cacheKeyList firstObject];
         [_cacheKeyList removeObjectAtIndex:0];
