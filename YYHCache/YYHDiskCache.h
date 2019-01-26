@@ -32,6 +32,8 @@
  */
 @property (assign) NSTimeInterval autoTrimInterval;
 
+@property (nonatomic, assign) NSInteger maxCacheAge;  //过期时间 单位s  默认一周
+
 /**
  *  @author wangsw, 16-01-22 19:01:25
  *
@@ -76,7 +78,7 @@
 - (void)setObject:(id<NSCoding>)object forKey:(NSString *)key withBlock:(void(^)(NSString *key))block;
 
 - (void)removeObjectForKey:(NSString *)key withBlock:(void(^)(NSString *key))block;
-- (void)removeAllObjectsWithBlock:(void(^)())block;
+- (void)removeAllObjectsWithBlock:(void(^)(void))block;
 
 - (void)cacheSize:(void(^)(NSUInteger size))block;
 

@@ -87,7 +87,7 @@
 - (void)setObject:(id<NSCoding>)object forKey:(NSString *)key withBlock:(void(^)(NSString *key))block;
 
 - (void)removeObjectForKey:(NSString *)key withBlock:(void(^)(NSString *key))block;
-- (void)removeAllObjectsWithBlock:(void(^)())block;
+- (void)removeAllObjectsWithBlock:(void(^)(void))block;
 
 - (void)cacheSize:(void(^)(NSUInteger size))block;
 

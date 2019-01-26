@@ -126,7 +126,7 @@
     [_diskCache removeAllObjects];
 }
 
-- (void)removeAllObjectsWithBlock:(void(^)())block {
+- (void)removeAllObjectsWithBlock:(void(^)(void))block {
     
     if (!block) {
         return;

@@ -16,10 +16,9 @@ static const NSInteger kDefaultCacheMaxCacheAge = 60 * 60 * 24 * 7; // 1 week
 @property (nonatomic, copy, readwrite) NSString *name;
 @property (nonatomic, copy, readwrite) NSURL *cacheURL;
 @property (nonatomic, strong) NSFileManager *fileManager;
-@property (nonatomic, assign) NSInteger maxCacheAge;
 
 @property (nonatomic, strong) NSLock *lock;
-@property (nonatomic, strong) dispatch_queue_t asyncQueue;;
+@property (nonatomic, strong) dispatch_queue_t asyncQueue;
 
 @end
 
@@ -205,7 +204,7 @@ static const NSInteger kDefaultCacheMaxCacheAge = 60 * 60 * 24 * 7; // 1 week
     }
 }
 
-- (void)removeAllObjectsWithBlock:(void(^)())block {
+- (void)removeAllObjectsWithBlock:(void(^)(void))block {
     
     if (!block) {
         return;
@@ -267,7 +266,7 @@ static const NSInteger kDefaultCacheMaxCacheAge = 60 * 60 * 24 * 7; // 1 week
         
         [self lock];
         // This enumerator prefetches useful properties for our cache files.
-        NSDirectoryEnumerator *fileEnumerator = [_fileManager enumeratorAtURL:_cacheURL
+        NSDirectoryEnumerator *fileEnumerator = [self.fileManager enumeratorAtURL:self.cacheURL
                                                    includingPropertiesForKeys:resourceKeys
                                                                       options:NSDirectoryEnumerationSkipsHiddenFiles
                                                                  errorHandler:NULL];
@@ -297,7 +296,7 @@ static const NSInteger kDefaultCacheMaxCacheAge = 60 * 60 * 24 * 7; // 1 week
         }
         
         for (NSURL *fileURL in urlsToDelete) {
-            [_fileManager removeItemAtURL:fileURL error:nil];
+            [self.fileManager removeItemAtURL:fileURL error:nil];
         }
         [self.lock unlock];
     });
