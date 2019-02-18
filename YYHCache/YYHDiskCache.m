@@ -236,6 +236,23 @@ static const NSInteger kDefaultCacheMaxCacheAge = 60 * 60 * 24 * 7; // 1 week
     });
 }
 
+- (NSArray *)allObjects {
+    
+    NSMutableArray *objects = [NSMutableArray arrayWithCapacity:1];
+    [_lock lock];
+    NSDirectoryEnumerator *fileEnumerator = [self.fileManager enumeratorAtPath:[self.cacheURL path]];
+    for (NSString *fileName in fileEnumerator) {
+        NSString *filePath = [[self.cacheURL path] stringByAppendingPathComponent:fileName];
+        NSData *data = [NSData dataWithContentsOfURL:[NSURL fileURLWithPath:filePath]];
+        if (data) {
+            [objects addObject:[NSKeyedUnarchiver unarchiveObjectWithData:data]];
+        }
+    }
+    [_lock unlock];
+    
+    return objects;
+}
+
 #pragma mark - Private
 
 - (NSURL *)p_fileNameWithKey:(NSString *)key {

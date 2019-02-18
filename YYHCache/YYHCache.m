@@ -141,4 +141,9 @@
     [_diskCache cacheSize:block];
 }
 
+- (NSArray *)allObjects {
+    
+    return [_diskCache allObjects];
+}
+
 @end

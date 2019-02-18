@@ -91,4 +91,6 @@
 
 - (void)cacheSize:(void(^)(NSUInteger size))block;
 
+- (NSArray *)allObjects;
+
 @end
