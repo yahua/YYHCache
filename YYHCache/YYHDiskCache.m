@@ -172,6 +172,9 @@ static const NSInteger kDefaultCacheMaxCacheAge = 60 * 60 * 24 * 7; // 1 week
     
     NSError *error= nil;
     NSURL *path = [self p_fileNameWithKey:key];
+    if (![_fileManager fileExistsAtPath:path.path]) {
+        return;
+    }
     [_lock lock];
     [_fileManager removeItemAtURL:path error:&error];
     [_lock unlock];
